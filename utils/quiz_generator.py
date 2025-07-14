@@ -7,6 +7,11 @@ from nltk import sent_tokenize
 from utils.points_manager import add_points
 from streamlit import session_state as st_session
 import streamlit as st
+import nltk
+nltk.download('punkt', quiet=True)
+
+from nltk import sent_tokenize
+
 
 # ✅ Use secrets, not .env
 groq_api_key = st.secrets["GROQ_API_KEY"]
