@@ -23,7 +23,7 @@ def train_model():
     model.fit(X_train, y_train)
 
     # Save model
-    joblib.dump(model, "rf_model.pkl")
+    joblib.dump(model, "model.pkl")
 
     # Evaluate
     y_pred = model.predict(X_test)
@@ -33,7 +33,7 @@ def train_model():
 
 def predict_performance(score, time_sec, attempts):
     # Load the trained model
-    model = joblib.load("rf_model.pkl")
+    model = joblib.load("model.pkl")
 
     # Prepare input features
     X = pd.DataFrame([{
