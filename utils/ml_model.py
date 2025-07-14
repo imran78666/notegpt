@@ -1,63 +1,73 @@
-# utils/ml_model.py
-
-import os
 import pandas as pd
 import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
-
-
-# Use absolute path to be safe
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "model.pkl")
+from sklearn.preprocessing import StandardScaler
 
 
 def train_model():
-    csv_path = os.path.join(os.path.dirname(__file__), "quiz_data.csv")
+    csv_path = "utils/quiz_data.csv"
     df = pd.read_csv(csv_path)
 
-    # Features and target
+    # Select features and target
     X = df[["quiz_score", "quiz_time_sec", "num_attempts"]]
-    y = df["label"].map({"pass": 1, "fail": 0})
+    y = df["label"].map({"pass": 1, "fail": 0})  # Convert labels to numeric
 
-    # Split data
+    # Train-test split
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
+        X, y, test_size=0.2, random_state=42
     )
 
-    # Train model with balanced classes
+    # Feature scaling
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
+    # Train model with balanced class weights
     model = RandomForestClassifier(
         n_estimators=200, random_state=42, class_weight="balanced"
     )
-    model.fit(X_train, y_train)
+    model.fit(X_train_scaled, y_train)
 
-    # Evaluate
-    y_pred = model.predict(X_test)
+    # Predict on test set
+    y_pred = model.predict(X_test_scaled)
+
+    # Print classification report and accuracy
     print("Model evaluation on test data:")
     print(classification_report(y_test, y_pred, target_names=["fail", "pass"]))
     print(f"Accuracy: {accuracy_score(y_test, y_pred):.2f}")
 
-    # Save model
-    joblib.dump(model, MODEL_PATH)
-    print(f"✅ Model trained and saved to {MODEL_PATH}")
+    # Save model and scaler to utils folder
+    joblib.dump(model, "utils/model.pkl")
+    joblib.dump(scaler, "utils/scaler.pkl")
+    print("✅ Model and scaler saved to utils/model.pkl and utils/scaler.pkl")
 
 
 def predict_performance(score, time_sec, attempts):
-    # Load the trained model
-    if not os.path.exists(MODEL_PATH):
-        raise FileNotFoundError(f"Model file not found at {MODEL_PATH}. Please train the model first.")
+    # Load model and scaler
+    model = joblib.load("utils/model.pkl")
+    scaler = joblib.load("utils/scaler.pkl")
 
-    model = joblib.load(MODEL_PATH)
-
-    # Create dataframe for input
+    # Prepare input features as dataframe
     X = pd.DataFrame(
-        [{"quiz_score": score, "quiz_time_sec": time_sec, "num_attempts": attempts}]
+        [
+            {
+                "quiz_score": score,
+                "quiz_time_sec": time_sec,
+                "num_attempts": attempts,
+            }
+        ]
     )
 
-    # Predict probability and class
-    proba = model.predict_proba(X)[0]
+    # Scale features
+    X_scaled = scaler.transform(X)
+
+    # Debug print probabilities
+    proba = model.predict_proba(X_scaled)[0]
     print(f"Prediction probabilities (fail, pass): {proba}")
 
-    prediction = model.predict(X)[0]
+    # Predict class
+    prediction = model.predict(X_scaled)[0]
 
     return "pass" if prediction == 1 else "fail"

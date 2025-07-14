@@ -26,5 +26,11 @@ st.markdown("""
 """)
 
 st.markdown("---")
-st.info("🎓 *Built as a Final Year Academic Project using Streamlit, Python & AI APIs.*")
+st.info("""
+🎓 *Built by Shaik Mohammed Imran, Final Year Student using Streamlit, ML, Python & LLM.*
+
+📧 **Email:** [skmdimran295@gmail.com](mailto:skmdimran295@gmail.com)  
+🔗 **LinkedIn:** [linkedin.com/imran](https://www.linkedin.com/in/mohammedimran78605/)
+💻 **GitHub:** [github.com/imran](https://github.com/imran78666)
+""")
 st.success("Made with ❤️ for Learning & Innovation.")
