@@ -1,15 +1,12 @@
 import streamlit as st
-import os
-from dotenv import load_dotenv
 from langchain.text_splitter import CharacterTextSplitter
 from groq import Groq
 from utils.points_manager import add_points  # ✅ Import points manager
 
-# Load API key from .env
-load_dotenv()
-groq_api_key = os.getenv("GROQ_API_KEY")
+# ✅ Load API key from Streamlit secrets
+groq_api_key = st.secrets["GROQ_API_KEY"]
 
-# Create Groq client
+# ✅ Create Groq client
 client = Groq(api_key=groq_api_key)
 
 

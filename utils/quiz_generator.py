@@ -1,19 +1,15 @@
 from groq import Groq
 import nltk
 import random
-import os
 import json
 import re
 from nltk import sent_tokenize
 from utils.points_manager import add_points
-from dotenv import load_dotenv
 from streamlit import session_state as st_session
+import streamlit as st
 
-nltk.download('punkt', quiet=True)
-
-# Load API key securely
-load_dotenv()
-groq_api_key = os.getenv("GROQ_API_KEY")
+# ✅ Use secrets, not .env
+groq_api_key = st.secrets["GROQ_API_KEY"]
 client = Groq(api_key=groq_api_key)
 
 
