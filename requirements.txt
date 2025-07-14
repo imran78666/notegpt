@@ -3,5 +3,8 @@ PyMuPDF==1.24.1
 transformers==4.41.1
 sentence-transformers==2.6.1
 nltk==3.8.1
-torch==2.1.2
+torch==2.1.0
 python-dotenv==1.0.1
+bcrypt
+pandas
+scikit-learn
