@@ -3,7 +3,7 @@ import nltk
 import random
 import json
 import re
-from nltk import sent_tokenize
+from nltk import sent_tokenize 
 from utils.points_manager import add_points
 from streamlit import session_state as st_session
 import streamlit as st
@@ -94,7 +94,7 @@ Return ONLY the JSON list. No extra text.
 """
         try:
             response = client.chat.completions.create(
-                model="llama3-70b-8192",
+                model="llama-3.3-70b-versatile",
                 messages=[{"role": "user", "content": prompt}]
             )
             content = response.choices[0].message.content.strip()
@@ -155,7 +155,7 @@ Return ONLY the JSON list. No extra text.
 """
         try:
             response = client.chat.completions.create(
-                model="llama3-70b-8192",
+                model="llama-3.3-70b-versatile",
                 messages=[{"role": "user", "content": prompt}]
             )
             content = response.choices[0].message.content.strip()

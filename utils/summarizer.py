@@ -28,7 +28,7 @@ CONTENT:
 SUMMARY:
 """
         response = client.chat.completions.create(
-            model="llama3-70b-8192",
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt.strip()}]
         )
         summaries.append(response.choices[0].message.content.strip())
@@ -46,7 +46,7 @@ PARTIAL SUMMARIES:
 FINAL SUMMARY:
 """
     final_response = client.chat.completions.create(
-        model="llama3-70b-8192",
+        model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": final_prompt.strip()}]
     )
 

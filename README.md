@@ -65,7 +65,7 @@ cd ai-edu-chatbot/notegpt-app
 ### 2. Install Dependencies
 
 pip install -r ../requirements.txt
-Ensure Python 3.8+ is installed.
+Ensure Python 3.12+ is installed.
 
 ### 3. Configure Your Groq API Key
 export GROQ_API_KEY="your_groq_api_key"   # Linux/macOS
