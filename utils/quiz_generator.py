@@ -11,10 +11,7 @@ from utils.points_manager import add_points
 # -------------------------------
 # ✅ Ensure NLTK punkt is available
 # -------------------------------
-try:
-    sent_tokenize("test")
-except LookupError:
-    nltk.download("punkt", quiet=True)
+nltk.download("punkt", quiet=True)
 
 # -------------------------------
 # ✅ Initialize Groq client
