@@ -5,13 +5,23 @@ import nltk
 import random
 import json
 import re
-from nltk import sent_tokenize
+from nltk.tokenize.punkt import PunktSentenceTokenizer
 from utils.points_manager import add_points
 
 # -------------------------------
-# ✅ Ensure NLTK punkt is available
+# ✅ Ensure NLTK punkt is available (Streamlit Cloud safe)
 # -------------------------------
-nltk.download("punkt", quiet=True)
+nltk_data_path = "/tmp/nltk_data"
+if nltk_data_path not in nltk.data.path:
+    nltk.data.path.append(nltk_data_path)
+
+try:
+    nltk.data.find("tokenizers/punkt")
+except LookupError:
+    nltk.download("punkt", download_dir=nltk_data_path, quiet=True)
+
+# Create a tokenizer instance
+tokenizer = PunktSentenceTokenizer()
 
 # -------------------------------
 # ✅ Initialize Groq client
@@ -65,7 +75,6 @@ def extract_json_array(text: str) -> list[dict]:
     try:
         return json.loads(text)
     except json.JSONDecodeError:
-        # fallback using regex
         match = re.search(r"\[\s*{.*?}\s*\]", text, re.DOTALL)
         if match:
             try:
@@ -79,7 +88,8 @@ def extract_json_array(text: str) -> list[dict]:
 # -------------------------------
 
 def generate_quiz(text: str, count: int = 5) -> list[tuple]:
-    sentences = [s for s in sent_tokenize(text) if not is_heading(s)]
+    # Use tokenizer.tokenize instead of sent_tokenize
+    sentences = [s for s in tokenizer.tokenize(text) if not is_heading(s)]
     if not sentences:
         return []
 
@@ -140,7 +150,7 @@ Return ONLY the JSON list. No extra text.
 
 
 def generate_quiz_by_topic(text: str, topic: str, num: int) -> list[tuple]:
-    sentences = [s for s in sent_tokenize(text) if not is_heading(s)]
+    sentences = [s for s in tokenizer.tokenize(text) if not is_heading(s)]
     if not sentences:
         return []
 
