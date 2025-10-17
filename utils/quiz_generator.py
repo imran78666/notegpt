@@ -1,29 +1,44 @@
+import streamlit as st
+from streamlit import session_state as st_session
 from groq import Groq
 import nltk
 import random
 import json
 import re
-from nltk import sent_tokenize 
-from utils.points_manager import add_points
-from streamlit import session_state as st_session
-import streamlit as st
-import nltk
-nltk.download('punkt', quiet=True)
-
 from nltk import sent_tokenize
+from utils.points_manager import add_points
 
+# -------------------------------
+# ✅ Ensure NLTK punkt is available
+# -------------------------------
+try:
+    nltk.data.find("tokenizers/punkt")
+except LookupError:
+    nltk.download("punkt", quiet=True)
 
-# ✅ Use secrets, not .env
-groq_api_key = st.secrets["GROQ_API_KEY"]
+# -------------------------------
+# ✅ Initialize Groq client
+# -------------------------------
+try:
+    groq_api_key = st.secrets["GROQ_API_KEY"]
+except KeyError:
+    raise KeyError(
+        'GROQ_API_KEY not found in Streamlit secrets. '
+        'Add it via Manage App → Secrets.'
+    )
+
 client = Groq(api_key=groq_api_key)
 
+# -------------------------------
+# ✅ Helper functions
+# -------------------------------
 
-def is_heading(line):
+def is_heading(line: str) -> bool:
     words = line.strip().split()
     return len(words) <= 8 and line.isupper()
 
 
-def split_sentences(sentences, max_chars=1500):
+def split_sentences(sentences: list[str], max_chars: int = 1500) -> list[str]:
     chunks = []
     current_chunk = []
     current_len = 0
@@ -39,7 +54,7 @@ def split_sentences(sentences, max_chars=1500):
     return chunks
 
 
-def clean_hint(hint):
+def clean_hint(hint: str) -> str:
     if not hint.strip():
         return "Think carefully about the concept."
     bad_keywords = ["check the text", "read carefully", "look at", "refer"]
@@ -48,18 +63,25 @@ def clean_hint(hint):
     return hint
 
 
-def extract_json_array(text):
-    """Extract JSON array from Groq's output using regex."""
-    match = re.search(r"\[\s*{.*?}\s*\]", text, re.DOTALL)
-    if match:
-        try:
-            return json.loads(match.group(0))
-        except Exception as e:
-            print("Parsing failed:", e)
-    return []
+def extract_json_array(text: str) -> list[dict]:
+    """Safely extract JSON array from Groq's output."""
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        # fallback using regex
+        match = re.search(r"\[\s*{.*?}\s*\]", text, re.DOTALL)
+        if match:
+            try:
+                return json.loads(match.group(0))
+            except Exception as e:
+                print("Parsing failed:", e)
+        return []
 
+# -------------------------------
+# ✅ Main quiz generator functions
+# -------------------------------
 
-def generate_quiz(text, count=5):
+def generate_quiz(text: str, count: int = 5) -> list[tuple]:
     sentences = [s for s in sent_tokenize(text) if not is_heading(s)]
     if not sentences:
         return []
@@ -120,7 +142,7 @@ Return ONLY the JSON list. No extra text.
     return quizzes[:count]
 
 
-def generate_quiz_by_topic(text, topic, num):
+def generate_quiz_by_topic(text: str, topic: str, num: int) -> list[tuple]:
     sentences = [s for s in sent_tokenize(text) if not is_heading(s)]
     if not sentences:
         return []
